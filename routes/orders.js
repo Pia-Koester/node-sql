@@ -20,7 +20,7 @@ const pool = new Pool({
 
 router.get("/", (req, res) => {
   pool
-    .query("SELECT * FROM users;")
+    .query("SELECT * FROM orders;")
     .then((data) => res.json(data))
     .catch((e) => res.sendStatus(500));
 });
@@ -28,17 +28,17 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   const { id } = req.params;
   pool
-    .query("SELECT * FROM users WHERE id=$1;", [id])
+    .query("SELECT * FROM orders WHERE id=$1;", [id])
     .then((data) => res.json(data))
     .catch((e) => res.sendStatus(404));
 });
 
 router.post("/", (req, res) => {
-  const { first_name, last_name, age, active } = req.body;
+  const { price, date, user_id } = req.body;
   pool
     .query(
-      "INSERT INTO users(first_name, last_name, age, active) VALUES ($1,$2,$3,$4) RETURNING *;",
-      [first_name, last_name, age, active]
+      "INSERT INTO orders(price, date, user_id) VALUES ($1,$2,$3) RETURNING *;",
+      [price, date, user_id]
     )
     .then((data) => res.status(201).json(data))
     .catch((e) => res.sendStatus(404));
@@ -47,9 +47,9 @@ router.post("/", (req, res) => {
 router.put("/:id", (req, res) => {
   // how can I check if what data is being updated and only update certains fields based on that?
   const { id } = req.params;
-  const { first_name } = req.body;
+  const { price } = req.body;
   pool
-    .query("UPDATE users SET first_name=$1 WHERE id =$2", [first_name, id])
+    .query("UPDATE orders SET price=$1 WHERE id =$2", [price, id])
     .then((data) => res.status(201).json(data))
     .catch((e) => res.sendStatus(404));
 });
@@ -57,7 +57,7 @@ router.put("/:id", (req, res) => {
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   pool
-    .query("DELETE FROM users WHERE id=$1", [id])
+    .query("DELETE FROM orders WHERE id=$1", [id])
     .then((data) => res.status(201).json(data))
     .catch((e) => res.sendStatus(404));
 });
